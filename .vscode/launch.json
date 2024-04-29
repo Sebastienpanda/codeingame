@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Lancer les tests",
             "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/temperature/codingame.js"
+            "program": "${workspaceFolder}/how-time-flies/codingame.js"
         }
     ]
 }
