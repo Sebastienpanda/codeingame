@@ -8,49 +8,63 @@ const readline = require("./readline");
 const BEGIN = readline();
 const END = readline();
 
-// dès qu'on trouve un point on split les valeurs dans un nouvel array
 const splitBegin = BEGIN.split(".");
 const splitEnd = END.split(".");
 
-// On stock le jours, le mois et l'année dans des nouvelles variables
-const dayBegin = splitBegin[0];
-const monthBegin = splitBegin[1];
-const yearsBegin = splitBegin[2];
+const dayBegin = parseInt(splitBegin[0]);
+const monthBegin = parseInt(splitBegin[1]);
+const yearsBegin = parseInt(splitBegin[2]);
 
-const dayEnd = splitEnd[0];
-const monthEnd = splitEnd[1];
-const yearsEnd = splitEnd[2];
+const dayEnd = parseInt(splitEnd[0]);
+const monthEnd = parseInt(splitEnd[1]);
+const yearsEnd = parseInt(splitEnd[2]);
 
-function getTotalDaysYears() {
-    const dateBegin = new Date(BEGIN);
-    const dateEnd = new Date(END);
-    const totalTime = dateEnd.getTime() - dateBegin.getTime();
-    const days = Math.round(totalTime / (1000 * 3600 * 24));
-    return days;
-}
-function getTotalDaysMonth() {
-    const dateBegin = new Date(BEGIN);
-    const dateEnd = new Date(END);
-    const totalTime = dateEnd.getTime() - dateBegin.getTime();
-    const totalDays = Math.round(totalTime / (1000 * 60 * 60 * 24));
-    console.log(totalDays * 31);
-}
+// On enlève - 1 à la date car Janvier commence à l'index 0
+const dateBegin = new Date(yearsBegin, monthBegin - 1, dayBegin);
+const dateEnd = new Date(yearsEnd, monthEnd - 1, dayEnd);
 
-// Même jours, même mois mais années différente
-if (dayBegin === dayEnd && monthBegin === monthEnd && yearsBegin < yearsEnd) {
-    const years = yearsEnd - yearsBegin;
-    const totalDays = getTotalDaysYears();
-    console.log(`${years} years, total ${totalDays} days`);
+// On calcule le nombre de jour, dateEnd - dateBegin nous renvois des ms donc on devise par 1000 pour les secondes, 60 pour les minutes, 60 pour les heures et 24 pour la journée
+const totalDays = Math.round((dateEnd - dateBegin) / (1000 * 60 * 60 * 24));
+
+// C'est l'année de différence entre l'année récente et l'année ancienne et pareil pour les mois
+let yearsDiff = yearsEnd - yearsBegin;
+let monthsDiff = monthEnd - monthBegin;
+
+// si month est inférieur à 0 alors on lui ajoute 12 et on descend l'année de -1
+if (monthsDiff < 0) {
+    monthsDiff += 12;
+    yearsDiff--;
 }
 
-// Même jours, même années mais mois différent
-if (dayBegin === dayEnd && monthBegin < monthEnd && typeof yearsBegin === typeof yearsEnd) {
-    const month = monthEnd - monthBegin;
-    const totalDays = getTotalDaysMonth();
-    console.log(`${month} months, total ${totalDays} days`);
+// si le totalDays est inférieur à 31 et que month est supérieur à 0 alors on enlève 1 au month
+if (totalDays < 31 && monthsDiff > 0) {
+    monthsDiff--;
 }
 
-//Même jours, même mois et mêmes années
-if (dayBegin === dayEnd && monthBegin === monthEnd && typeof yearsBegin === typeof yearsEnd) {
-    console.log("total 0 days");
+// si le jour supérieur est inférieur au jour ancien alors on enlève 1 à month
+if (dayEnd < dayBegin) {
+    monthsDiff--;
 }
+
+// On stocke les résultats
+let result = [];
+
+// si l'année est supérieur à 0 alors on push et on ajoute s si il y a plus qu'une seul année
+if (yearsDiff > 0) {
+    result.push(`${yearsDiff} year${yearsDiff > 1 ? "s" : ""}`);
+}
+
+// si le mois est supérieur à 0 alors on push et on ajoute s si il y a plus qu'un seul mois
+if (monthsDiff > 0) {
+    result.push(`${monthsDiff} month${monthsDiff > 1 ? "s" : ""}`);
+}
+
+// si totalDays vaux 0 alors on push total 0 days sinon on push la value de days
+if (totalDays === 0) {
+    result.push(`total 0 days`);
+} else {
+    result.push(`total ${totalDays} days`);
+}
+
+// On renvoie un console log en mettant une virgule à tout nos valeurs en les espacants
+console.log(result.join(", "));
